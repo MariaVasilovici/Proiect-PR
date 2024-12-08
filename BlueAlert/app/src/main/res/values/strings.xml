@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Blue Alert</string>
+    <string name="temperature_label">Temperature:</string>
+</resources>
