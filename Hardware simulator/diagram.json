@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "author": "Maria Vasilovici",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 34.8,
+      "left": 186.2,
+      "attrs": { "color": "cyan" }
+    },
+    {
+      "type": "wokwi-pir-motion-sensor",
+      "id": "pir1",
+      "top": -111.2,
+      "left": -55.38,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 138.35,
+      "left": 163.2,
+      "attrs": { "value": "1000" }
+    },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -114.9, "left": 138.6, "attrs": {} },
+    { "type": "chip-mq4", "id": "chip1", "top": 1.02, "left": -264, "attrs": {} },
+    { "type": "chip-pulse", "id": "chip2", "top": 116.22, "left": -244.8, "attrs": {} },
+    { "type": "board-cd74hc4067", "id": "mux2", "top": 34.05, "left": -100.91, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "pir1:GND", "esp:GND.2", "black", [ "h114.94", "v48" ] ],
+    [ "pir1:VCC", "esp:5V", "red", [ "v0" ] ],
+    [ "pir1:OUT", "esp:34", "green", [ "v0" ] ],
+    [ "led1:C", "r1:2", "black", [ "v48", "h20.8" ] ],
+    [ "r1:1", "esp:GND.2", "black", [ "v-76.8", "h-38.4", "v-19.2" ] ],
+    [ "led1:A", "esp:19", "green", [ "v0" ] ],
+    [ "dht1:VCC", "esp:5V", "red", [ "v220.8", "h-153.6" ] ],
+    [ "dht1:SDA", "esp:22", "green", [ "v0" ] ],
+    [ "dht1:GND", "esp:GND.2", "black", [ "v0" ] ],
+    [ "chip1:VCC", "esp:5V", "red", [ "h0", "v-28.8", "h134.4", "v220.8" ] ],
+    [ "chip1:GND", "esp:GND.2", "black", [ "h-38.4", "v-48", "h336", "v57.6" ] ],
+    [ "chip2:GND", "esp:GND.2", "black", [ "h-19.2", "v-105.6", "h302.36" ] ],
+    [ "chip2:VCC", "esp:5V", "red", [ "h0", "v86.4" ] ],
+    [ "esp:35", "mux2:COM", "green", [ "h-33.41", "v-9.6" ] ],
+    [ "mux2:I0", "chip2:OUT", "green", [ "h-163.2", "v-38.4" ] ],
+    [ "mux2:I1", "chip1:A0", "green", [ "h-19.2", "v-105.6", "h-153.6", "v-38.4" ] ],
+    [ "mux2:S0", "esp:23", "green", [ "h0" ] ],
+    [ "mux2:VCC", "esp:5V", "red", [ "h38.43", "v67.2" ] ],
+    [ "mux2:GND", "esp:GND.1", "black", [ "h0" ] ]
+  ],
+  "dependencies": {}
+}

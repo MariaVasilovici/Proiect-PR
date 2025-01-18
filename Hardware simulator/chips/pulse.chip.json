@@ -1,0 +1,17 @@
+{
+  "name": "pulse",
+  "author": "",
+  "pins": [
+    "VCC",
+    "GND",
+    "OUT",
+    "","","",""
+  ],
+  "controls": [{
+      "id": "pulse",
+      "label": "PULSE",
+      "type": "slider",
+      "min":40,
+      "max":200
+    }]
+}
