@@ -49,4 +49,5 @@ dependencies {
     implementation(libs.app.update)
     implementation(libs.app.update.ktx)
     implementation(libs.graphview)
+    implementation(libs.bcpkix.jdk15on)
 }
