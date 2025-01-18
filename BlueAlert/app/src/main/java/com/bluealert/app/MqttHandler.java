@@ -1,5 +1,6 @@
 package com.bluealert.app;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -11,6 +12,14 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import android.content.Context;
 import android.util.Log;
 
+import java.security.SecureRandom;
+
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 public class MqttHandler {
 
@@ -59,10 +68,49 @@ public class MqttHandler {
             connectOptions.setCleanSession(true);
             connectOptions.setAutomaticReconnect(true);
 
+            connectOptions.setUserName("android_app");
+            connectOptions.setPassword("android_app_password".toCharArray());
+
+            try {
+                // Create SSLSocketFactory
+                SSLSocketFactory socketFactory = (SSLSocketFactory) makeSocketFactory();
+
+                // Set the SSLSocketFactory to the options
+                connectOptions.setSocketFactory(socketFactory);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             // Connect to the broker
             client.connect(connectOptions);
         } catch (MqttException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static SocketFactory makeSocketFactory() {
+        try {
+            TrustManager[] trustManagers = new TrustManager[]{
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {                        }
+
+                        @Override
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {}
+
+                        @Override
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new java.security.cert.X509Certificate[0];
+                        }
+                    }
+            };
+
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustManagers, new SecureRandom());
+            return sslContext.getSocketFactory();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create a fake SocketFactory", e);
         }
     }
 

@@ -12,10 +12,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,15 +23,16 @@ import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-import android.app.Notification;
-import android.app.NotificationManager;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+
 import android.content.Intent;
 import android.app.PendingIntent;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String BROKER_URL = "tcp://192.168.68.245:1883";
+    private static final String BROKER_URL = "ssl://192.168.10.2:8883";
     private static final String CLIENT_ID = "android_app";
     private MqttHandler mqttHandler;
     private TextView temperatureValue;
@@ -57,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         // Initialize the TextView
         temperatureValue = findViewById(R.id.temperatureValue);
         pulseValue = findViewById(R.id.pulseValue);
+
 
         // Check and request notification permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -148,33 +147,33 @@ public class MainActivity extends AppCompatActivity {
 
     // Method to handle the arrival of the message on the subscribed topic
     public void onMessageArrived(String topic, String message) {
-        if ("home/sensors/temperature".equals(topic)) {
-            temperatureValue.setText(message + " °C");
+        runOnUiThread(() -> {
+            if ("home/sensors/temperature".equals(topic)) {
+                temperatureValue.setText(message + " °C");
 
-            // Parse the temperature value
-            double y = Double.parseDouble(message);
+                // Parse the temperature value
+                double y = Double.parseDouble(message);
 
-            // Append the new data point to the graph
-            addDataPoint(x, y);
-            x++; // Increment x for the next point
+                // Append the new data point to the graph
+                addDataPoint(x, y);
+                x++; // Increment x for the next point
+            }
+            if ("home/sensors/pir".equals(topic)) {
+                // Call this method when you want to send a notification
+                sendNotification("Security Alert", "Motion detected! Please check your premises.");
+            }
+            if ("home/sensors/dangerous gases".equals(topic)) {
+                // Call this method when you want to send a notification
+                sendNotification("Gas Leak Alert", "Possible gas leak detected! Please check your stove and other gas appliances.");
+            }
+            if ("home/sensors/pulse".equals(topic)) {
+                pulseValue.setText(message + " bmp");
 
-        }
-        if ("home/sensors/pir".equals(topic)) {
-            // Call this method when you want to send a notification
-            sendNotification("Security Alert", "Motion detected! Please check your premises.");
-        }
-        if ("home/sensors/dangerous gases".equals(topic)) {
-            // Call this method when you want to send a notification
-            sendNotification("Gas Leak Alert", "Possible gas leak detected! Please check your stove and other gas appliances.");
-        }
-
-        if ("home/sensors/pulse".equals(topic)) {
-            pulseValue.setText(message + " bmp");
-
-            double y = Double.parseDouble(message);
-            addDataPointPulse(xP, y);
-            xP++;
-        }
+                double y = Double.parseDouble(message);
+                addDataPointPulse(xP, y);
+                xP++;
+            }
+        });
     }
 
     private void publishMessage(String topic, String message){
@@ -268,4 +267,10 @@ public class MainActivity extends AppCompatActivity {
         pulseGraph.getViewport().setMaxY(yViewportEnd);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions,
+                                           int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 }
