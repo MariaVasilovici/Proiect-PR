@@ -1,5 +1,55 @@
-	Proiectul propus reprezintă dezvoltarea unui sistem de casă inteligentă, care integrează un set de senzori și actuatori pentru monitorizarea și controlul condițiilor din locuință. Acest sistem va oferi utilizatorilor informații valoroase în timp real prin intermediul unei aplicații pe telefon (Blue Alert), având ca scop creșterea siguranței și confortului acestora.
+Structura Fișierelor
 
-	Sistemul se bazează pe patru senzori: un senzor de temperatură, un senzor PIR (Passive Infrared), un senzor de gaz metan și un senzor de puls. Pe lângă aceștia, proiectul include și un actuator, respectiv un LED care poate fi controlat de la distanță prin aplicație, permițând utilizatorului să-l aprindă sau să-l stingă după necesitate.
+    BlueAlert/
+    Conține toate fișierele necesare pentru aplicația mobilă. Utilizatorul va trebui să utilizeze Android Studio pentru a importa acest proiect și a-l instala pe un dispozitiv mobil.
 
-	Datele colectate de la senzori vor fi transmise prin protocolul MQTT către un broker local (laptop-ul utilizatorului), iar acestea vor fi vizualizate sub forma unor grafice interactive în aplicație. În plus, sistemul va trimite notificări utilizatorilor în cazurile de detectare a gazului metan sau de mișcare, în funcție de setările din aplicație, sporind astfel securitatea locuinței. Acest proiect își propune să îmbunătățească atât siguranța cât și confortul utilizatorilor prin integrarea eficientă a tehnologiilor IoT (Internet of Things) într-un sistem accesibil și ușor de utilizat.
+    Hardware simulator/
+    Directorul dedicat simulării hardware, care include:
+        diagram.json: Diagrama hardware creată în Wokwi.
+        src/: Codul pentru microcontroller:
+            main.py: Cod principal pentru rularea simulării.
+            simple.py: Cod care trebuie încărcat pe microcontroller.
+        chips/: Contine implementările personalizate pentru senzorii MQ-4 și Puls:
+            Fiecare senzor include codul în C, fișierul JSON pentru configurare și versiunea compilată în WebAssembly (.wasm).
+
+    components.py
+    Un script Python pentru generarea datelor simulate, utilizat înainte de a dezvolta simularea hardware în Wokwi.
+
+    Raport detaliat.pdf
+    Documentația proiectului, ce include Introducere, Arhitectură, Implementare, etc.
+
+
+
+Instrucțiuni de Instalare și Utilizare
+
+1. Configurarea Brokerului MQTT
+
+    Instalați Mosquitto de pe pagina oficială Mosquitto.
+    Configurați brokerul MQTT prin editarea fișierului mosquitto.conf pentru a permite conexiuni externe.
+    Porniți brokerul folosind comanda:
+
+	mosquitto -v -c "C:\Program Files\mosquitto\mosquitto.conf"
+
+Notă: Asigurați-vă că IP-ul din fișierul MainActivity.java (pentru aplicația mobilă) și src/main.py (pentru simularea hardware) corespunde cu cel al brokerului MQTT.
+
+
+2. Instalarea și Rularea Aplicației Mobile
+
+    Descărcați și instalați Android Studio.
+    Deschideți Android Studio și importați directorul BlueAlert/.
+    Conectați un dispozitiv Android (sau utilizați un emulator).
+    Rulați aplicația pe telefon pentru a verifica funcționalitatea.
+
+
+3. Simularea Hardware
+
+Pregătirea Microcontrollerului
+
+    Conectați microcontrollerul utilizând mpremote.
+    Încărcați fișierul simple.py pe placă cu comanda:
+
+py -m mpremote connect port:rfc2217://localhost:4000 fs cp src/simple.py :simple.py
+
+Rulați simularea hardware folosind:
+
+py -m mpremote connect port:rfc2217://localhost:4000 run src/main.py
